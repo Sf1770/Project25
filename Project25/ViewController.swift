@@ -11,6 +11,7 @@ import MultipeerConnectivity
 
 class ViewController: UICollectionViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate, MCSessionDelegate, MCBrowserViewControllerDelegate{
     var images = [UIImage]()
+    var beacons = [String]()
     
     var peerID: MCPeerID!
     var mcSession: MCSession!
@@ -21,8 +22,9 @@ class ViewController: UICollectionViewController, UINavigationControllerDelegate
         // Do any additional setup after loading the view, typically from a nib.
         title = "Selfie Share"
         //adds a right bar button item that uses camera icon
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .camera, target: self, action: #selector(importPicture))
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(showConnectionPrompt))
+        //navigationItem.rightBarButtonItems = [UIBarButtonItem(barButtonSystemItem: .camera, target: self, action: #selector(importPicture))]
+        //UIBarButtonItem(barButtonSystemItem: .search, target: self, action: #selector(beaconList))
+        //navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(showConnectionPrompt))
         //initializes our MCSession in order to make connections
         peerID = MCPeerID(displayName: UIDevice.current.name)
         mcSession = MCSession(peer: peerID, securityIdentity: nil, encryptionPreference: .required)
@@ -30,6 +32,7 @@ class ViewController: UICollectionViewController, UINavigationControllerDelegate
         
     }
     
+
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return images.count
     }
@@ -43,24 +46,100 @@ class ViewController: UICollectionViewController, UINavigationControllerDelegate
         return cell
     }
     
-    @objc func importPicture() {
-        print("Import picture worked")
+    
+    @IBAction func importPicture(_ sender: UIBarButtonItem) {
         let picker = UIImagePickerController()
         picker.allowsEditing = true
         picker.delegate = self
-        present(picker, animated: true)
+        let ac = UIAlertController(title: "Import Picture From...", message: nil, preferredStyle: .actionSheet)
+        if(UIImagePickerController.isSourceTypeAvailable(.camera)){
+            ac.addAction(UIAlertAction(title: "Camera", style: .default){
+                (alert) -> Void in
+                picker.sourceType = .camera
+                picker.modalPresentationStyle = .fullScreen
+                self.present(picker, animated: true, completion: nil)
+                
+            })
+        }
+        
+        ac.addAction(UIAlertAction(title: "Select photo from Library", style: .default) {
+            (alert) -> Void in
+            picker.sourceType = .photoLibrary
+            self.present(picker, animated: true, completion: nil)
+        })
+        
+        ac.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        if let popOverController = ac.popoverPresentationController{
+            popOverController.barButtonItem = self.navigationItem.rightBarButtonItem
+        }
+        
+        present(ac, animated: true)
+        
         
     }
     
-    @objc func showConnectionPrompt() {
+    
+//    @objc func importPicture() {
+//        //print("Import picture worked")
+//        let picker = UIImagePickerController()
+//        picker.allowsEditing = true
+//        picker.delegate = self
+//        let ac = UIAlertController(title: "Import Picture From...", message: nil, preferredStyle: .actionSheet)
+//        if(UIImagePickerController.isSourceTypeAvailable(.camera)){
+//            ac.addAction(UIAlertAction(title: "Camera", style: .default){
+//                (alert) -> Void in
+//                picker.sourceType = .camera
+//                picker.modalPresentationStyle = .fullScreen
+//                self.present(picker, animated: true, completion: nil)
+//
+//            })
+//        }
+//        ac.addAction(UIAlertAction(title: "Select photo from Library", style: .default) {
+//            (alert) -> Void in
+//            picker.sourceType = .photoLibrary
+//            self.present(picker, animated: true, completion: nil)
+//        })
+//        ac.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+//        if let popOverController = ac.popoverPresentationController{
+//            popOverController.barButtonItem = self.navigationItem.rightBarButtonItem
+//        }
+//
+//        present(ac, animated: true)
+//
+//    }
+    
+    @IBAction func showConnectionPrompt(_ sender: UIBarButtonItem) {
         print("Connection Prompt Reached")
         let ac = UIAlertController(title: "Connect to others", message: nil, preferredStyle: .actionSheet)
         ac.addAction(UIAlertAction(title: "Host a session", style: .default, handler: startHosting))
         ac.addAction(UIAlertAction(title: "Join a session", style: .default, handler: joinSession))
-        ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        ac.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        //need to do this to display a popover view in an iPad
         ac.popoverPresentationController?.sourceView = self.view
         present(ac, animated: true)
+        
     }
+    
+//    @objc func showConnectionPrompt() {
+//        print("Connection Prompt Reached")
+//        let ac = UIAlertController(title: "Connect to others", message: nil, preferredStyle: .actionSheet)
+//        ac.addAction(UIAlertAction(title: "Host a session", style: .default, handler: startHosting))
+//        ac.addAction(UIAlertAction(title: "Join a session", style: .default, handler: joinSession))
+//        ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+//        //need to do this to display a popover view in an iPad
+//        ac.popoverPresentationController?.sourceView = self.view
+//        present(ac, animated: true)
+//    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let vc = segue.destination as? beaconListVC {
+            print("Array passed")
+            //passes the list of connected beacons to the beacon VC
+            vc.beaconList = beacons
+        }
+    }
+    
+    
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         guard let image = info[UIImagePickerControllerEditedImage] as? UIImage else {return}
@@ -78,7 +157,7 @@ class ViewController: UICollectionViewController, UINavigationControllerDelegate
                     try mcSession.send(imageData, toPeers: mcSession.connectedPeers, with: .reliable)
                 } catch{
                     //4, shows an error message if there's a problem
-                    let ac = UIAlertController(title: "Send erro", message: error.localizedDescription, preferredStyle: .alert)
+                    let ac = UIAlertController(title: "Send error", message: error.localizedDescription, preferredStyle: .alert)
                     
                     ac.addAction(UIAlertAction(title: "OK", style: .default))
                     present(ac, animated: true)
@@ -127,12 +206,18 @@ class ViewController: UICollectionViewController, UINavigationControllerDelegate
         switch state {
         case MCSessionState.connected:
             print("Connected: \(peerID.displayName)")
+            beacons.append(peerID.displayName)
+            
             
         case MCSessionState.connecting:
             print("Connecting: \(peerID.displayName)")
             
+            
         case MCSessionState.notConnected:
             print("Not Connected: \(peerID.displayName)")
+            if let index = beacons.index(of: peerID.displayName){
+                beacons.remove(at: index)
+            }
         }
     }
     

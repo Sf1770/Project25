@@ -12,6 +12,7 @@
 		041F78F320BF4A7B00E83C02 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 041F78F120BF4A7B00E83C02 /* Main.storyboard */; };
 		041F78F520BF4A7D00E83C02 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 041F78F420BF4A7D00E83C02 /* Assets.xcassets */; };
 		041F78F820BF4A7D00E83C02 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 041F78F620BF4A7D00E83C02 /* LaunchScreen.storyboard */; };
+		0494604D20D98951004C8DAE /* beaconListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0494604C20D98951004C8DAE /* beaconListVC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		041F78F420BF4A7D00E83C02 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		041F78F720BF4A7D00E83C02 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		041F78F920BF4A7D00E83C02 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0494604C20D98951004C8DAE /* beaconListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = beaconListVC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +58,7 @@
 			children = (
 				041F78ED20BF4A7B00E83C02 /* AppDelegate.swift */,
 				041F78EF20BF4A7B00E83C02 /* ViewController.swift */,
+				0494604C20D98951004C8DAE /* beaconListVC.swift */,
 				041F78F120BF4A7B00E83C02 /* Main.storyboard */,
 				041F78F420BF4A7D00E83C02 /* Assets.xcassets */,
 				041F78F620BF4A7D00E83C02 /* LaunchScreen.storyboard */,
@@ -137,6 +140,7 @@
 			files = (
 				041F78F020BF4A7B00E83C02 /* ViewController.swift in Sources */,
 				041F78EE20BF4A7B00E83C02 /* AppDelegate.swift in Sources */,
+				0494604D20D98951004C8DAE /* beaconListVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
